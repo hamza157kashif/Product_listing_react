@@ -21,6 +21,9 @@ const ProductEffectAPI = () => {
 
   let navigate = useNavigate();
 
+  const openProduct = (id) => {
+    navigate("/{id}");
+  };
   return (
     <>
       <div>
@@ -28,17 +31,20 @@ const ProductEffectAPI = () => {
         <div className="addbuton">
           <button
             type="button"
-            class="btn btn-success"
+            className="btn btn-success"
             className="addbutton"
             onClick={() => navigate("/newProduct")}
           >
-            <i class="bi bi-plus">+</i> Add Product
+            <i className="bi bi-plus">+</i> Add Product
           </button>
         </div>
 
         <div className="container-fluid mt-5">
           <div className="row text-center">
             {products.map((curProd) => {
+              const val = curProd.id;
+              let prodlink = "/product/";
+              prodlink = prodlink.concat(val);
               return (
                 <div className="col-10 col-md-4 mt-5" key={curProd.id}>
                   <div className="card p-2">
@@ -49,6 +55,7 @@ const ProductEffectAPI = () => {
                           src={curProd.imageURL}
                           className="rounded"
                           width="155"
+                          onClick={() => navigate(prodlink)}
                         />{" "}
                       </div>
                       <div className="ml-3 w-100">

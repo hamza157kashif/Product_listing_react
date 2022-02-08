@@ -79,6 +79,7 @@ h4 {
 }
 
 .previewImage {
+  margin-top: 20px;
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -88,7 +89,6 @@ h4 {
 .btncontainer {
   height: 200px;
   position: relative;
-  border: 3px solid green;
 }
 
 .btncenter {
@@ -98,6 +98,9 @@ h4 {
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+}
+.cropresetbtn {
+  font-size: small;
 }
 
 .btn,

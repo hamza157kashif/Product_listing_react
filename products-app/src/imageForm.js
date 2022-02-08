@@ -6,6 +6,8 @@ import axios from "axios";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
+import { useNavigate } from "react-router-dom";
+
 async function postImage({ image, description, productname }) {
   const formData = new FormData();
   formData.append("image", image);
@@ -29,37 +31,48 @@ const ImageFormAPI = () => {
   const [file, setFile] = useState();
   const [description, setDescription] = useState("");
   const [productname, setProductName] = useState("");
+
   const [previewimage, setpreviewImage] = useState(null);
   const [croppedImage, setCroppedImage] = useState(null);
   const [image, setImage] = useState(null);
+
+  const [originalimage, setorginalImage] = useState(null);
+
   //crop
   const [crop, setCrop] = useState({ aspect: 1 / 1 });
+
+  let navigate = useNavigate();
 
   const submit = async (event) => {
     event.preventDefault();
     const result = await postImage({ image: file, description, productname });
-    // setImages([result.image, ...images]);
+    navigate("/");
   };
 
   const fileSelected = (event) => {
     const file = event.target.files[0];
-    setFile(file);
+    setorginalImage(URL.createObjectURL(event.target.files[0]));
     setpreviewImage(URL.createObjectURL(event.target.files[0]));
+    setFile(file);
+    // const reader = new FileReader();
+    // reader.readAsDataURL(file);
+
+    // dataURLtoFile(reader.result, "basic.jpg");
   };
 
-  // const PreviewImage = (event) => {
-  //   const file = event.target.files[0];
-  //   setFile(file);
-  //   setImage(URL.createObjectURL(event.target.files[0]));
+  const dataURLtoFile = (dataurl, filename) => {
+    let arr = dataurl.split(","),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
 
-  //   var oFReader = new FileReader();
-  //   console.log("in preview");
-  //   oFReader.readAsDataURL(document.getElementById("uploadImage").files[0]);
-
-  //   oFReader.onload = function (oFREvent) {
-  //     document.getElementById("uploadPreview").src = oFREvent.target.result;
-  //   };
-  // };
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    const finalImage = new File([u8arr], filename, { type: mime });
+    setFile(finalImage);
+  };
 
   function getCroppedImg() {
     const canvas = document.createElement("canvas");
@@ -81,12 +94,21 @@ const ImageFormAPI = () => {
       crop.height
     );
     const base64Image = canvas.toDataURL("image/jpeg");
-    setCroppedImage(base64Image);
+    //setCroppedImage(base64Image);
+    setpreviewImage(base64Image);
 
+    const reader = new FileReader();
     canvas.toBlob((blob) => {
-      setFile(blob);
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => {
+        dataURLtoFile(reader.result, "cropped.jpg");
+      };
     });
   }
+
+  const restoreImg = () => {
+    setpreviewImage(originalimage);
+  };
 
   return (
     <div className="App">
@@ -127,17 +149,18 @@ const ImageFormAPI = () => {
       />
       <div className="btncontainer">
         <div className="btncenter">
-          <button className="btn btn-danger" onClick={getCroppedImg}>
+          <button className="btn btn-danger btn-sm" onClick={getCroppedImg}>
             Crop Image
           </button>
         </div>
       </div>
-
-      {croppedImage && (
-        <div className="container">
-          <img className="previewImage" alt="croppedimage" src={croppedImage} />
+      <div className="btncontainer">
+        <div className="btncenter">
+          <button className="btn btn-danger btn-sm" onClick={restoreImg}>
+            Reset
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
